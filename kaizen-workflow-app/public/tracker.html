@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/styles.css">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaizen Improvement Tracker</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(120deg, #0062ff, #00b894);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    nav {
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffdd59;
+    }
+
+    h1 {
+      margin-top: 40px;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-bottom: 30px;
+    }
+
+    .tracker {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 15px;
+      display: inline-block;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    input, select {
+      padding: 12px;
+      margin: 8px;
+      border-radius: 8px;
+      border: none;
+      width: 45%;
+      font-size: 0.95rem;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #00b894;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      margin: 8px 5px;
+    }
+
+    button:hover {
+      background: #009970;
+      transform: scale(1.05);
+    }
+
+    .danger {
+      background: #d63031;
+    }
+
+    .idea {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(6px);
+      margin: 20px auto;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: left;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      transition: 0.3s ease;
+    }
+
+    .idea:hover {
+      transform: scale(1.02);
+    }
+
+    .idea img {
+      margin-top: 8px;
+      border-radius: 6px;
+      max-width: 100%;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    footer {
+      margin-top: 50px;
+      opacity: 0.8;
+      font-size: 0.9rem;
+    }
+    /* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.4s ease;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.success {
+  background: linear-gradient(120deg, #00b894, #00cec9);
+}
+
+.toast.error {
+  background: linear-gradient(120deg, #d63031, #e17055);
+}
+
+.toast.info {
+  background: linear-gradient(120deg, #0984e3, #74b9ff);
+}
+
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="tracker.html">Tracker</a>
+    <a href="tools/5s.html">Tools</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <h1>Kaizen Improvement Tracker</h1>
+  <p>Log your continuous improvement ideas, track their progress, attach photos, or reset your data anytime.</p>
+
+  <div class="tracker">
+    <input id="ideaInput" type="text" placeholder="Enter improvement idea..." />
+    <select id="department">
+      <option value="Production">Production</option>
+      <option value="Maintenance">Maintenance</option>
+      <option value="Sales">Sales</option>
+      <option value="Logistics">Logistics</option>
+      <option value="HR">HR</option>
+      <option value="Admin">Admin</option>
+    </select>
+    <select id="category">
+      <option value="Efficiency">Efficiency</option>
+      <option value="Safety">Safety</option>
+      <option value="Quality">Quality</option>
+      <option value="Cost Saving">Cost Saving</option>
+      <option value="Other">Other</option>
+    </select>
+    <select id="statusSelect">
+      <option>In Progress</option>
+      <option>Completed</option>
+      <option>On Hold</option>
+    </select>
+    <br>
+
+    <label for="photoInput">Attach Image (optional):</label>
+    <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(event)">
+    <div id="photoPreview" style="margin-top:10px;"></div>
+
+    <br>
+    <button onclick="addIdea()">Add Idea</button>
+    <button onclick="resetData()" class="danger">🔄 Reset All Data</button>
+  </div>
+
+  <div id="ideaList"></div>
+
+  <footer>© 2026 Kaizen Workflow — Continuous Improvement, Simplified.</footer>
+
+  <script>
+    function previewPhoto(event) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById("photoPreview").innerHTML =
+          `<img src="${e.target.result}" style="max-width:200px;border-radius:5px;">`;
+        localStorage.setItem("ideaPhoto", e.target.result);
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function addIdea() {
+      const text = document.getElementById("ideaInput").value.trim();
+      const department = document.getElementById("department").value;
+      const category = document.getElementById("category").value;
+      const status = document.getElementById("statusSelect").value;
+      const photo = localStorage.getItem("ideaPhoto") || null;
+
+      if (!text) {
+       showToast("⚠️ Please enter an idea before adding!", "error");
+        return;
+      }
+
+      const newIdea = { text, department, category, status, photo };
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      ideas.push(newIdea);
+      localStorage.setItem("kaizenIdeas", JSON.stringify(ideas));
+      localStorage.removeItem("ideaPhoto");
+
+      document.getElementById("ideaInput").value = "";
+      document.getElementById("photoPreview").innerHTML = "";
+      loadIdeas();
+    }
+
+    function loadIdeas() {
+      const ideaList = document.getElementById("ideaList");
+      ideaList.innerHTML = "";
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+
+      ideas.forEach((idea, index) => {
+        const div = document.createElement("div");
+        div.className = "idea";
+        div.innerHTML = `
+          <h3>${idea.text}</h3>
+          <p><b>Department:</b> ${idea.department} | <b>Category:</b> ${idea.category} | <b>Status:</b> ${idea.status}</p>
+          ${
+            idea.photo
+              ? `<img src="${idea.photo}" alt="Idea photo"><br><button onclick="removeIdeaPhoto(${index})" style="background:#e17055;color:white;border:none;padding:5px 10px;border-radius:5px;">❌ Remove Photo</button>`
+              : `<input type="file" accept="image/*" onchange="updateIdeaPhoto(event, ${index})">`
+          }
+          <br><br>
+          <button onclick="deleteIdea(${index})" class="danger">🗑️ Delete</button>
+        `;
+        ideaList.appendChild(div);
+      });
+    }
+
+    function updateIdeaPhoto(event, index) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+        ideas[index].photo = e.target.result;
+        localStorage.setItem("kaizenIdeas", JSON.stringify(ideas));
+        loadIdeas();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeIdeaPhoto(index) {
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      if (ideas[index]) {
+        delete ideas[index].photo;
+        localStorage.setItem("kaizenIdeas", JSON.stringify(ideas));
+        loadIdeas();
+      }
+    }
+
+    function deleteIdea(index) {
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      ideas.splice(index, 1);
+      localStorage.setItem("kaizenIdeas", JSON.stringify(ideas));
+      loadIdeas();
+    }
+
+    function resetData() {
+      if (confirm("⚠️ This will delete ALL ideas and photos. Continue?")) {
+        localStorage.removeItem("kaizenIdeas");
+      showToast("✅ All data cleared successfully!", "success");
+        loadIdeas();
+      }
+    }
+function showToast(message, type = "info") {
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.classList.add("show"), 100);
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+    window.onload = loadIdeas;
+  </script>
+</body>
+</html>

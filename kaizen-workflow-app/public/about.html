@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/styles.css">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - Kaizen Workflow</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(120deg, #0062ff, #00b894);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+    }
+
+    nav {
+      margin-bottom: 40px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 12px;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+      color: #00ffcc;
+    }
+
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 10px;
+    }
+
+    .about-section {
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      padding: 30px;
+      margin: 0 auto 40px;
+      text-align: left;
+      line-height: 1.6em;
+    }
+
+    .about-section h2 {
+      color: #00ffcc;
+      margin-top: 20px;
+    }
+
+    .credit-box {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .credit-box p {
+      margin: 8px 0;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+
+    img.logo {
+      height: 80px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <img src="/images/logo.png" alt="Kaizen Workflow Logo" class="logo">
+    <a href="/">Home</a> |
+    <a href="/dashboard.html">Dashboard</a> |
+    <a href="/tracker.html">Tracker</a> |
+    <a href="/tools/index.html">Tools</a> |
+    <a href="/about.html">About</a>
+  </nav>
+
+  <h1>About Kaizen Workflow</h1>
+  <p>Continuous improvement made simple, measurable, and effective.</p>
+
+  <div class="about-section">
+    <h2>🌱 Our Mission</h2>
+    <p>
+      Kaizen Workflow is designed to make continuous improvement accessible for every team.
+      From production to administration, this platform helps track, visualize, and enhance
+      workplace efficiency through structured improvement tracking and data insights.
+    </p>
+
+    <h2>🛠️ Core Features</h2>
+    <ul>
+      <li>5S Audit Tool for workplace organization assessments</li>
+      <li>Real-time Idea Tracker to log and monitor Kaizen improvements</li>
+      <li>Visual Dashboard for progress, completion rates, and 5S scores</li>
+      <li>Department and category-based performance analytics</li>
+      <li>Simple, local-first data storage (no internet needed)</li>
+    </ul>
+
+    <h2>🚀 Future Updates</h2>
+    <p>
+      Planned updates include:
+      <ul>
+        <li>Multi-user collaboration & cloud sync</li>
+        <li>Advanced analytics with exportable reports</li>
+        <li>Department performance benchmarking</li>
+        <li>Optional Premium Add-on tools for Safety and Quality tracking</li>
+      </ul>
+    </p>
+
+    <h2>📦 Version Info</h2>
+    <div class="credit-box">
+      <p><strong>Kaizen Workflow App</strong> — Base Version 1.0</p>
+      <p>Created with ❤️ to simplify continuous improvement management.</p>
+      <p>All data is stored locally in your browser for privacy and reliability.</p>
+      <p>For feature requests or feedback: <a href="mailto:support@kaizenworkflow.app" style="color:#00ffcc;">support@kaizenworkflow.app</a></p>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 Kaizen Workflow — Continuous Improvement, Simplified.</p>
+  </footer>
+  <script>
+async function loadAppVersion() {
+  try {
+    const res = await fetch('/version.json');
+    const appInfo = await res.json();
+
+    // Display version info in footer
+    const footer = document.createElement("footer");
+    footer.style.marginTop = "40px";
+    footer.style.padding = "10px";
+    footer.style.fontSize = "0.9em";
+    footer.style.opacity = "0.8";
+    footer.innerHTML = `Kaizen Workflow ${appInfo.edition} v${appInfo.version} — © 2026`;
+
+    document.body.appendChild(footer);
+
+    // Check for update
+    const currentVersion = localStorage.getItem("appVersion") || "0.0.0";
+    if (appInfo.version !== currentVersion) {
+      alert(`🚀 New version ${appInfo.version} available!`);
+      localStorage.setItem("appVersion", appInfo.version);
+    }
+
+    // Apply feature lock
+    applyFeatureLocks(appInfo.features);
+
+  } catch (err) {
+    console.warn("Version check failed:", err);
+  }
+}
+
+function applyFeatureLocks(features) {
+  // 🔹 Image Upload Lock
+  if (!features.imageUpload) {
+    document.querySelectorAll('input[type="file"]').forEach(el => el.style.display = "none");
+  }
+
+  // 🔹 Export/Import Lock
+  if (!features.exportImport && document.querySelector(".backup-controls")) {
+    document.querySelector(".backup-controls").style.display = "none";
+  }
+
+  // 🔹 Cloud Sync (future)
+  if (!features.cloudSync) {
+    const syncBtn = document.getElementById("cloudSyncBtn");
+    if (syncBtn) syncBtn.style.display = "none";
+  }
+
+  // 🔹 Advanced Tools Lock
+  if (!features.advancedTools) {
+    const advTools = document.querySelector(".advanced-tools");
+    if (advTools) advTools.style.display = "none";
+  }
+}
+
+window.onload = loadAppVersion;
+</script>
+
+</body>
+</html>

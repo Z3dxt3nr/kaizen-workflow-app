@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/styles.css">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kaizen Workflow - Continuous Improvement Platform</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(120deg, #0062ff, #00b894);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    nav {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 12px;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+      color: #00ffcc;
+    }
+
+    .hero {
+      padding: 100px 20px 60px 20px;
+    }
+
+    .hero img {
+      height: 90px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+
+    .hero h1 {
+      font-size: 2.8em;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: 1.2em;
+      max-width: 700px;
+      margin: 0 auto 30px auto;
+      opacity: 0.9;
+    }
+
+    .button {
+      background: #00b894;
+      border: none;
+      color: white;
+      padding: 15px 40px;
+      border-radius: 8px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .button:hover {
+      background: #00ffcc;
+      color: #0062ff;
+    }
+
+    .features {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      margin: 50px auto;
+      padding: 30px;
+      max-width: 900px;
+      text-align: left;
+    }
+
+    .features h2 {
+      text-align: center;
+      color: #00ffcc;
+      margin-bottom: 20px;
+    }
+
+    .features ul {
+      list-style: none;
+      padding: 0;
+      font-size: 1.1em;
+    }
+
+    .features li {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    footer {
+      margin-top: 40px;
+      padding: 20px;
+      font-size: 0.9em;
+      opacity: 0.8;
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <img src="/images/logo.png" alt="Kaizen Workflow Logo" style="height: 40px; border-radius: 6px; vertical-align: middle;">
+    <a href="/">Home</a> |
+    <a href="/dashboard.html">Dashboard</a> |
+    <a href="/tracker.html">Tracker</a> |
+    <a href="/tools/index.html">Tools</a> |
+    <a href="/about.html">About</a>
+  </nav>
+
+  <div class="hero">
+    <img src="/images/logo.png" alt="Kaizen Workflow Logo">
+    <h1>Kaizen Workflow</h1>
+    <p>
+      Empower your team to achieve continuous improvement.  
+      Track, visualize, and enhance business performance with simplicity and data clarity.
+    </p>
+    <button class="button" onclick="window.location.href='/tools/index.html'">Get Started</button>
+  </div>
+
+  <div class="features">
+    <h2>Why Kaizen Workflow?</h2>
+    <ul>
+      <li>📊 Data-driven Dashboard to visualize improvements and 5S performance</li>
+      <li>🧩 Tracker to log and manage improvement ideas across departments</li>
+      <li>🧹 5S Audit Tool to evaluate organization and workplace efficiency</li>
+      <li>🧠 Intuitive design for all users — no training required</li>
+      <li>🔒 Local data storage for privacy and offline access</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>© 2026 Kaizen Workflow — Continuous Improvement, Simplified.</p>
+  </footer>
+  <script>
+async function loadAppVersion() {
+  try {
+    const res = await fetch('/version.json');
+    const appInfo = await res.json();
+
+    // Display version info in footer
+    const footer = document.createElement("footer");
+    footer.style.marginTop = "40px";
+    footer.style.padding = "10px";
+    footer.style.fontSize = "0.9em";
+    footer.style.opacity = "0.8";
+    footer.innerHTML = `Kaizen Workflow ${appInfo.edition} v${appInfo.version} — © 2026`;
+
+    document.body.appendChild(footer);
+
+    // Check for update
+    const currentVersion = localStorage.getItem("appVersion") || "0.0.0";
+    if (appInfo.version !== currentVersion) {
+      alert(`🚀 New version ${appInfo.version} available!`);
+      localStorage.setItem("appVersion", appInfo.version);
+    }
+
+    // Apply feature lock
+    applyFeatureLocks(appInfo.features);
+
+  } catch (err) {
+    console.warn("Version check failed:", err);
+  }
+}
+
+function applyFeatureLocks(features) {
+  // 🔹 Image Upload Lock
+  if (!features.imageUpload) {
+    document.querySelectorAll('input[type="file"]').forEach(el => el.style.display = "none");
+  }
+
+  // 🔹 Export/Import Lock
+  if (!features.exportImport && document.querySelector(".backup-controls")) {
+    document.querySelector(".backup-controls").style.display = "none";
+  }
+
+  // 🔹 Cloud Sync (future)
+  if (!features.cloudSync) {
+    const syncBtn = document.getElementById("cloudSyncBtn");
+    if (syncBtn) syncBtn.style.display = "none";
+  }
+
+  // 🔹 Advanced Tools Lock
+  if (!features.advancedTools) {
+    const advTools = document.querySelector(".advanced-tools");
+    if (advTools) advTools.style.display = "none";
+  }
+}
+
+window.onload = loadAppVersion;
+</script>
+
+</body>
+</html>
+                                                                                                                                                                                                                                                                                            

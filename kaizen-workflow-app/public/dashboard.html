@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/styles.css">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kaizen Workflow Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(120deg, #0062ff, #00b894);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+    }
+
+    nav {
+      margin-bottom: 40px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 12px;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+      color: #00ffcc;
+    }
+
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 1.1em;
+    }
+
+    .summary {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 30px 0;
+    }
+
+    .summary-card {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 20px 30px;
+      width: 200px;
+    }
+
+    canvas {
+      max-width: 700px;
+      margin: 20px auto;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .progress-section {
+      margin-top: 40px;
+    }
+
+    .progress-container {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      width: 80%;
+      max-width: 600px;
+      margin: 0 auto;
+      height: 25px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 25px;
+      background: #00ffcc;
+      width: 0%;
+      border-radius: 10px;
+      transition: width 1.5s ease;
+    }
+
+    .card {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <img src="/images/logo.png" alt="Kaizen Workflow Logo" style="height: 40px; border-radius: 6px; vertical-align: middle;">
+    <a href="/">Home</a> |
+    <a href="/dashboard.html">Dashboard</a> |
+    <a href="/tracker.html">Tracker</a> |
+    <a href="/tools/index.html">Tools</a> |
+    <a href="/about.html">About</a>
+  </nav>
+
+  <h1>📊 Kaizen Workflow Dashboard</h1>
+  <p>Visualize progress, efficiency, and 5S improvements across departments.</p>
+
+  <!-- Summary Cards -->
+  <div class="summary">
+    <div class="summary-card">
+      <h2 id="totalIdeas">0</h2>
+      <p>Total Ideas</p>
+    </div>
+    <div class="summary-card">
+      <h2 id="completedIdeas">0</h2>
+      <p>Completed</p>
+    </div>
+    <div class="summary-card">
+      <h2 id="inProgressIdeas">0</h2>
+      <p>In Progress</p>
+    </div>
+    <div class="summary-card">
+      <h2 id="onHoldIdeas">0</h2>
+      <p>On Hold</p>
+    </div>
+    <div class="summary-card">
+      <h2 id="avgScore">-</h2>
+      <p>Avg 5S Score</p>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <h2>Ideas by Department</h2>
+  <canvas id="deptChart" width="400" height="200"></canvas>
+
+  <h2>Status Overview</h2>
+  <canvas id="statusChart" width="400" height="200"></canvas>
+
+  <!-- Progress -->
+  <div class="progress-section">
+    <h2>Overall Progress</h2>
+    <div class="progress-container">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
+    <p id="progressPercent">0% Completed</p>
+  </div>
+
+  <div class="card">
+    <h2>📈 Monthly Progress Trends</h2>
+    <canvas id="trendChart"></canvas>
+  </div>
+
+  <script>
+    // Add date to ideas automatically when first saved
+    function initializeDates() {
+      let ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      let updated = false;
+      ideas = ideas.map(i => {
+        if (!i.dateAdded) {
+          i.dateAdded = new Date().toISOString();
+          updated = true;
+        }
+        return i;
+      });
+      if (updated) localStorage.setItem("kaizenIdeas", JSON.stringify(ideas));
+    }
+
+    function loadDashboard() {
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+
+      // === SUMMARY CALCULATIONS ===
+      const total = ideas.length;
+      const completed = ideas.filter(i => i.status === "Completed").length;
+      const inProgress = ideas.filter(i => i.status === "In Progress").length;
+      const onHold = ideas.filter(i => i.status === "On Hold").length;
+
+      // === UPDATE SUMMARY COUNTS ===
+      document.getElementById("totalIdeas").innerText = total;
+      document.getElementById("completedIdeas").innerText = completed;
+      document.getElementById("inProgressIdeas").innerText = inProgress;
+      document.getElementById("onHoldIdeas").innerText = onHold;
+
+      // === PROGRESS BAR ===
+      const percent = total ? Math.round((completed / total) * 100) : 0;
+      document.getElementById("progressBar").style.width = percent + "%";
+      document.getElementById("progressPercent").innerText = `${percent}% Completed`;
+
+      // === IDEAS BY DEPARTMENT PIE CHART ===
+      const deptCounts = {};
+      ideas.forEach(i => {
+        deptCounts[i.department] = (deptCounts[i.department] || 0) + 1;
+      });
+
+      const ctxDept = document.getElementById("deptChart");
+      if (ctxDept) {
+        new Chart(ctxDept, {
+          type: "pie",
+          data: {
+            labels: Object.keys(deptCounts),
+            datasets: [{
+              data: Object.values(deptCounts),
+              backgroundColor: ["#0984e3", "#00b894", "#fdcb6e", "#e17055", "#6c5ce7"]
+            }]
+          },
+          options: { plugins: { legend: { position: "bottom" } } }
+        });
+      }
+
+      // === STATUS BAR CHART ===
+      const ctxStatus = document.getElementById("statusChart");
+      if (ctxStatus) {
+        new Chart(ctxStatus, {
+          type: "bar",
+          data: {
+            labels: ["Completed", "In Progress", "On Hold"],
+            datasets: [{
+              label: "Kaizen Ideas by Status",
+              data: [completed, inProgress, onHold],
+              backgroundColor: ["#00ff88", "#0062ff", "#ff7675"],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+
+      // === MONTHLY TREND LINE CHART ===
+      const monthlyAdded = {};
+      const monthlyCompleted = {};
+
+      ideas.forEach(i => {
+        const date = i.dateAdded ? new Date(i.dateAdded) : new Date();
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+        monthlyAdded[monthKey] = (monthlyAdded[monthKey] || 0) + 1;
+        if (i.status === "Completed") {
+          monthlyCompleted[monthKey] = (monthlyCompleted[monthKey] || 0) + 1;
+        }
+      });
+
+      const allMonths = [...new Set(Object.keys(monthlyAdded).concat(Object.keys(monthlyCompleted)))].sort();
+      const addedData = allMonths.map(m => monthlyAdded[m] || 0);
+      const completedData = allMonths.map(m => monthlyCompleted[m] || 0);
+
+      const ctxTrend = document.getElementById("trendChart");
+      if (ctxTrend) {
+        new Chart(ctxTrend, {
+          type: "line",
+          data: {
+            labels: allMonths.map(m => {
+              const [year, month] = m.split("-");
+              return `${new Date(year, month - 1).toLocaleString("default", { month: "short" })} ${year}`;
+            }),
+            datasets: [
+              {
+                label: "Ideas Added",
+                data: addedData,
+                borderColor: "#74b9ff",
+                backgroundColor: "rgba(116, 185, 255, 0.2)",
+                tension: 0.4,
+                fill: true
+              },
+              {
+                label: "Ideas Completed",
+                data: completedData,
+                borderColor: "#00b894",
+                backgroundColor: "rgba(0, 184, 148, 0.2)",
+                tension: 0.4,
+                fill: true
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom" } },
+            scales: {
+              y: { beginAtZero: true, ticks: { color: "white" } },
+              x: { ticks: { color: "white" } }
+            }
+          }
+        });
+      }
+    }
+
+    initializeDates();
+    window.onload = loadDashboard;
+  </script>
+</body>
+</html>

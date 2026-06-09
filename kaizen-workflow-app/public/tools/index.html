@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/styles.css">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kaizen Tools Hub</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, #0062ff, #00b894);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      margin: 0;
+    }
+
+    nav {
+      margin-bottom: 30px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 0 10px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 30px;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .tool-card {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: left;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .tool-card h2 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    .tool-card p {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: #e6e6e6;
+      min-height: 70px;
+    }
+
+    .button {
+      display: inline-block;
+      background: #00b894;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      margin-top: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    .button:hover {
+      background: #009d75;
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 1.6rem; }
+      .tool-card { text-align: center; }
+      .tool-card p { min-height: auto; }
+      .button { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<nav style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+  <img src="/images/logo.png" alt="Kaizen Workflow Logo" style="height: 45px; border-radius: 6px;">
+  <a href="/">Home</a> |
+  <a href="/dashboard.html">Dashboard</a> |
+  <a href="/tracker.html">Tracker</a> |
+  <a href="/tools/index.html">Tools</a> |
+  <a href="/about.html">About</a>
+</nav>
+
+
+
+  <h1>🧰 Kaizen Tools Hub</h1>
+  <p>Access your continuous improvement tools below.</p>
+
+  <div class="tools-grid">
+
+    <!-- 5S Tool -->
+    <div class="tool-card">
+      <h2>🧹 5S Audit Tool</h2>
+      <p>Evaluate workplace organization and cleanliness across the 5S principles — Sort, Set, Shine, Standardize, Sustain.</p>
+      <a href="/tools/5s.html" class="button">Launch Tool</a>
+    </div>
+
+    <!-- PDCA Tool -->
+    <div class="tool-card">
+      <h2>🔄 PDCA Planner</h2>
+      <p>Plan, Do, Check, Act — create structured improvement cycles with notes, deadlines, and follow-ups.</p>
+      <a href="#" class="button" onclick="comingSoon('PDCA Planner')">Coming Soon</a>
+    </div>
+
+    <!-- Waste Tracker -->
+    <div class="tool-card">
+      <h2>📉 Waste Tracker</h2>
+      <p>Identify and categorize waste (Muda) in your processes to highlight improvement opportunities.</p>
+      <a href="#" class="button" onclick="comingSoon('Waste Tracker')">Coming Soon</a>
+    </div>
+
+    <!-- Root Cause Tool -->
+    <div class="tool-card">
+      <h2>🧠 Root Cause Analyzer</h2>
+      <p>Use the Fishbone or 5-Why method to dig into the underlying causes of process problems.</p>
+      <a href="#" class="button" onclick="comingSoon('Root Cause Analyzer')">Coming Soon</a>
+    </div>
+
+    <!-- Timeline Simulator -->
+    <div class="tool-card">
+      <h2>📅 Improvement Timeline</h2>
+      <p>Project the cumulative impact of changes over time with a simulated improvement curve.</p>
+      <a href="#" class="button" onclick="comingSoon('Timeline Simulator')">Coming Soon</a>
+    </div>
+
+  </div>
+
+  <script>
+    function comingSoon(toolName) {
+      alert(`${toolName} is under development and will be available soon!`);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/styles.css">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5S Audit Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(120deg, #0062ff, #00b894);
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+
+    nav {
+      margin-bottom: 40px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 12px;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #00ffcc;
+      text-decoration: underline;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 20px;
+      width: 80%;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      color: white;
+    }
+
+    th, td {
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: #00b894;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<nav style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+  <img src="/images/logo.png" alt="Kaizen Workflow Logo" style="height: 45px; border-radius: 6px;">
+  <a href="/">Home</a> |
+  <a href="/dashboard.html">Dashboard</a> |
+  <a href="/tracker.html">Tracker</a> |
+  <a href="/tools/index.html">Tools</a> |
+  <a href="/about.html">About</a>
+</nav>
+
+
+  <h1>🧹 5S Audit Tool</h1>
+  <p>Evaluate your workspace with the 5S methodology: Sort, Set in Order, Shine, Standardize, and Sustain.</p>
+
+ <div class="card">
+  <table>
+    <tr><th>Category</th><th>Score (1–5)</th></tr>
+    <tr><td>Sort</td><td><input type="number" id="sort" min="1" max="5" /></td></tr>
+    <tr><td>Set in Order</td><td><input type="number" id="setOrder" min="1" max="5" /></td></tr>
+    <tr><td>Shine</td><td><input type="number" id="shine" min="1" max="5" /></td></tr>
+    <tr><td>Standardize</td><td><input type="number" id="standardize" min="1" max="5" /></td></tr>
+    <tr><td>Sustain</td><td><input type="number" id="sustain" min="1" max="5" /></td></tr>
+  </table>
+
+  <h3 style="margin-top: 20px;">Select Department</h3>
+  <select id="departmentSelect" style="padding: 10px; border-radius: 6px; border: none;">
+    <option value="">-- Choose Department --</option>
+    <option value="Production">Production</option>
+    <option value="Maintenance">Maintenance</option>
+    <option value="Logistics">Logistics</option>
+    <option value="Quality">Quality</option>
+    <option value="Sales">Sales</option>
+    <option value="Administration">Administration</option>
+  </select>
+
+  <br><br>
+  <button onclick="calculate5S()">Calculate Score</button>
+  <button id="saveAudit" onclick="saveAudit()" style="display:none;">Save Results to Tracker</button>
+  <h3 id="result"></h3>
+</div>
+
+<script>
+  function calculate5S() {
+    const values = [
+      +document.getElementById('sort').value || 0,
+      +document.getElementById('setOrder').value || 0,
+      +document.getElementById('shine').value || 0,
+      +document.getElementById('standardize').value || 0,
+      +document.getElementById('sustain').value || 0,
+    ];
+    const total = values.reduce((a,b) => a+b, 0);
+    const average = (total / 5).toFixed(2);
+
+    document.getElementById('result').innerText = `Average 5S Score: ${average}/5`;
+    document.getElementById('saveAudit').style.display = "inline-block"; // show save button
+  }
+
+  function saveAudit() {
+    const department = document.getElementById('departmentSelect').value;
+    const scoreText = document.getElementById('result').innerText;
+
+    if (!scoreText) {
+      alert("Please calculate the score first!");
+      return;
+    }
+    if (!department) {
+      alert("Please select a department before saving!");
+      return;
+    }
+
+    const date = new Date().toLocaleDateString();
+
+    const newIdea = {
+      text: `5S Audit completed - ${scoreText}`,
+      department: department,
+      category: "5S Audit",
+      status: "Completed",
+      date: date
+    };
+
+    const existingIdeas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+    existingIdeas.push(newIdea);
+    localStorage.setItem("kaizenIdeas", JSON.stringify(existingIdeas));
+
+    alert(`✅ 5S Audit saved to Tracker for ${department}!`);
+  }
+</script>
+
+
+</body>
+</html>
