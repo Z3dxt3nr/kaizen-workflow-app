@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaizen Workflow — Continuous Improvement Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #1a1a2e;
+      background: #0a0a1a;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ===== UTILITY ===== */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #0062ff, #00b894);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.6);
+      max-width: 600px;
+      line-height: 1.7;
+    }
+
+    /* ===== GLASSMORPHISM ===== */
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 36px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0, 98, 255, 0.15);
+      border-color: rgba(0, 184, 148, 0.3);
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 36px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #0062ff, #00b894);
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(0, 98, 255, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0, 98, 255, 0.5);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 20px 0;
+      transition: background 0.3s ease, padding 0.3s ease;
+    }
+    .navbar.scrolled {
+      background: rgba(10, 10, 26, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 12px 0;
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0062ff, #00b894);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta {
+      padding: 10px 24px !important;
+      font-size: 0.85rem !important;
+      border-radius: 10px !important;
+    }
+    .mobile-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .mobile-toggle span { display: block; width: 24px; height: 2px; background: #fff; margin: 6px 0; transition: 0.3s; }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 40%, rgba(0, 98, 255, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 60%, rgba(0, 184, 148, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 20%, rgba(0, 98, 255, 0.08) 0%, transparent 50%);
+    }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero .container {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .hero-content h1 {
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 24px;
+    }
+    .hero-content h1 .gradient-text {
+      background: linear-gradient(135deg, #0062ff, #00b894);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-content p {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 520px;
+    }
+    .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
+    .hero-stats { display: flex; gap: 40px; }
+    .hero-stat { text-align: left; }
+    .hero-stat .number {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0062ff, #00b894);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-stat .label { font-size: 0.8rem; color: rgba(255,255,255,0.4); font-weight: 500; }
+
+    /* Hero visual */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .hero-mockup {
+      width: 100%;
+      max-width: 520px;
+      aspect-ratio: 4/3;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+    }
+    .mockup-header {
+      height: 40px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 8px;
+    }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-dot.red { background: #ff5f57; }
+    .mockup-dot.yellow { background: #febc2e; }
+    .mockup-dot.green { background: #28c840; }
+    .mockup-body {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      height: calc(100% - 40px);
+    }
+    .mockup-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mockup-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #0062ff, #00b894);
+    }
+    .mockup-bar.short { width: 60%; background: rgba(255,255,255,0.12); }
+    .mockup-bar.medium { width: 80%; background: linear-gradient(90deg, #0062ff, #00b894); opacity: 0.6; }
+    .mockup-bar.long { width: 100%; background: linear-gradient(90deg, #0062ff, #00b894); opacity: 0.3; }
+    .mockup-line { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); }
+    .mockup-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      flex: 1;
+      padding-top: 8px;
+    }
+    .mockup-chart .bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(to top, #0062ff, #00b894);
+      opacity: 0.7;
+    }
+    .floating-badge {
+      position: absolute;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 14px 20px;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      animation: float 6s ease-in-out infinite;
+    }
+    .floating-badge.top-right { top: -20px; right: -20px; animation-delay: 0s; }
+    .floating-badge.bottom-left { bottom: -20px; left: -20px; animation-delay: 3s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* ===== FEATURES ===== */
+    .features { padding: 100px 0; position: relative; }
+    .features .container { text-align: center; }
+    .features .section-subtitle { margin: 0 auto 60px; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+      text-align: left;
+    }
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(0,98,255,0.15), rgba(0,184,148,0.15));
+      border: 1px solid rgba(0,98,255,0.2);
+    }
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ===== SCREENSHOTS ===== */
+    .screenshots {
+      padding: 100px 0;
+      position: relative;
+      background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(0,98,255,0.06) 0%, transparent 70%);
+    }
+    .screenshots .container { text-align: center; }
+    .screenshots .section-subtitle { margin: 0 auto 60px; }
+    .screenshots-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .screenshot-card {
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 16/10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.5);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: 2px dashed rgba(255,255,255,0.12);
+      transition: border-color 0.3s;
+    }
+    .screenshot-card:hover { border-color: rgba(0,184,148,0.4); }
+    .screenshot-card .ss-icon { font-size: 2rem; margin-bottom: 12px; opacity: 0.5; }
+    .screenshot-card:nth-child(1) { background: linear-gradient(135deg, rgba(0,98,255,0.08), rgba(0,98,255,0.02)); }
+    .screenshot-card:nth-child(2) { background: linear-gradient(135deg, rgba(0,184,148,0.08), rgba(0,184,148,0.02)); }
+    .screenshot-card:nth-child(3) { background: linear-gradient(135deg, rgba(0,98,255,0.06), rgba(0,184,148,0.06)); }
+    .screenshot-card:nth-child(4) { background: linear-gradient(135deg, rgba(0,184,148,0.06), rgba(0,98,255,0.06)); }
+    .screenshot-card:nth-child(5) { background: linear-gradient(135deg, rgba(0,98,255,0.1), rgba(0,184,148,0.02)); }
+    .screenshot-card:nth-child(6) { background: linear-gradient(135deg, rgba(0,184,148,0.1), rgba(0,98,255,0.02)); }
+
+    /* ===== HOW IT WORKS ===== */
+    .how-it-works { padding: 100px 0; position: relative; }
+    .how-it-works .container { text-align: center; }
+    .how-it-works .section-subtitle { margin: 0 auto 60px; }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      position: relative;
+    }
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 48px;
+      left: 16.66%;
+      right: 16.66%;
+      height: 2px;
+      background: linear-gradient(90deg, #0062ff, #00b894);
+      opacity: 0.3;
+    }
+    .step-card { text-align: center; position: relative; z-index: 1; }
+    .step-number {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0062ff, #00b894);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 auto 24px;
+      box-shadow: 0 8px 30px rgba(0,98,255,0.3);
+    }
+    .step-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .step-card p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6;
+    }
+
+    /* ===== PRICING ===== */
+    .pricing { padding: 100px 0; position: relative; }
+    .pricing .container { text-align: center; }
+    .pricing .section-subtitle { margin: 0 auto 60px; }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .pricing-card {
+      text-align: left;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-card.featured {
+      border-color: rgba(0,184,148,0.4);
+      box-shadow: 0 0 60px rgba(0,184,148,0.1);
+    }
+    .pricing-card.featured::before {
+      content: 'Most Popular';
+      position: absolute;
+      top: 24px;
+      right: -32px;
+      background: linear-gradient(135deg, #0062ff, #00b894);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 6px 40px;
+      transform: rotate(45deg);
+      letter-spacing: 1px;
+    }
+    .pricing-tier {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 12px;
+    }
+    .pricing-amount {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .pricing-amount span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.4);
+    }
+    .pricing-desc {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 28px;
+    }
+    .pricing-features { margin-bottom: 32px; }
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+    }
+    .pricing-features li .check {
+      color: #00b894;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .pricing-card .btn { width: 100%; justify-content: center; }
+
+    /* ===== FAQ ===== */
+    .faq { padding: 100px 0; position: relative; }
+    .faq .container { text-align: center; }
+    .faq .section-subtitle { margin: 0 auto 60px; }
+    .faq-grid {
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      color: #fff;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      text-align: left;
+      gap: 16px;
+    }
+    .faq-question:hover { color: #00b894; }
+    .faq-toggle {
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.4);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+    .faq-item.open .faq-toggle { transform: rotate(45deg); color: #00b894; }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding-bottom: 24px;
+    }
+    .faq-answer p {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.7;
+    }
+
+    /* ===== CTA ===== */
+    .cta {
+      padding: 100px 0;
+      position: relative;
+    }
+    .cta-box {
+      text-align: center;
+      padding: 80px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,98,255,0.15), rgba(0,184,148,0.15));
+      z-index: 0;
+    }
+    .cta-box > * { position: relative; z-index: 1; }
+    .cta h2 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .cta p {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 36px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta .btn { font-size: 1.1rem; padding: 18px 44px; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      padding: 60px 0 40px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 48px;
+    }
+    .footer-brand p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.4);
+      margin-top: 16px;
+      line-height: 1.6;
+      max-width: 300px;
+    }
+    .footer-col h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 20px;
+    }
+    .footer-col a {
+      display: block;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.45);
+      padding: 6px 0;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: #00b894; }
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-bottom p {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.3);
+    }
+    .footer-social { display: flex; gap: 16px; }
+    .footer-social a {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+      transition: all 0.2s;
+    }
+    .footer-social a:hover { background: rgba(0,184,148,0.2); color: #00b894; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 960px) {
+      .hero .container { grid-template-columns: 1fr; text-align: center; }
+      .hero-content p { margin-left: auto; margin-right: auto; }
+      .hero-buttons { justify-content: center; }
+      .hero-stats { justify-content: center; }
+      .hero-visual { order: -1; }
+      .hero-mockup { max-width: 400px; margin: 0 auto; }
+      .features-grid { grid-template-columns: 1fr; }
+      .screenshots-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid { grid-template-columns: 1fr; gap: 40px; }
+      .steps-grid::before { display: none; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .mobile-toggle { display: block; }
+      .nav-links.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(10,10,26,0.95);
+        backdrop-filter: blur(20px);
+        padding: 24px;
+        gap: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+      .hero { padding: 100px 0 60px; }
+      .hero-stats { flex-direction: column; gap: 20px; }
+      .screenshots-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .floating-badge { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#" class="nav-logo">Kaizen Workflow</a>
+      <div class="nav-links" id="navLinks">
+        <a href="#features">Features</a>
+        <a href="#screenshots">Screenshots</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="YOUR_GUMROAD_LINK_HERO" class="btn btn-primary nav-cta">Get It Now →</a>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="container">
+      <div class="hero-content">
+        <h1>Continuous Improvement,<br><span class="gradient-text">Simplified.</span></h1>
+        <p>Kaizen Workflow is the all-in-one web app for lean practitioners, plant managers, and operations teams to track improvements, run 5S audits, and visualize performance — all from your browser.</p>
+        <div class="hero-buttons">
+          <a href="YOUR_GUMROAD_LINK_HERO" class="btn btn-primary">Get Kaizen Workflow →</a>
+          <a href="#features" class="btn btn-secondary">Learn More</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="number">4+</div>
+            <div class="label">Core Tools</div>
+          </div>
+          <div class="hero-stat">
+            <div class="number">100%</div>
+            <div class="label">Self-Hosted</div>
+          </div>
+          <div class="hero-stat">
+            <div class="number">Free</div>
+            <div class="label">Base Version</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-mockup glass">
+          <div class="mockup-header">
+            <div class="mockup-dot red"></div>
+            <div class="mockup-dot yellow"></div>
+            <div class="mockup-dot green"></div>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-card">
+              <div class="mockup-line" style="width:60%;height:10px;border-radius:5px;background:rgba(255,255,255,0.1);"></div>
+              <div class="mockup-chart">
+                <div class="bar" style="height:40%"></div>
+                <div class="bar" style="height:65%"></div>
+                <div class="bar" style="height:50%"></div>
+                <div class="bar" style="height:80%"></div>
+                <div class="bar" style="height:60%"></div>
+                <div class="bar" style="height:90%"></div>
+              </div>
+            </div>
+            <div class="mockup-card">
+              <div class="mockup-line" style="width:50%;height:10px;border-radius:5px;background:rgba(255,255,255,0.1);"></div>
+              <div class="mockup-bar" style="width:75%"></div>
+              <div class="mockup-bar short" style="width:45%"></div>
+              <div class="mockup-bar medium" style="width:60%"></div>
+            </div>
+            <div class="mockup-card" style="grid-column:span 2">
+              <div class="mockup-line" style="width:40%;height:10px;border-radius:5px;background:rgba(255,255,255,0.1);margin-bottom:8px;"></div>
+              <div style="display:flex;gap:8px;">
+                <div style="flex:1;height:32px;border-radius:8px;background:rgba(0,98,255,0.2);border:1px solid rgba(0,98,255,0.3);"></div>
+                <div style="flex:1;height:32px;border-radius:8px;background:rgba(0,184,148,0.2);border:1px solid rgba(0,184,148,0.3);"></div>
+                <div style="flex:1;height:32px;border-radius:8px;background:rgba(0,98,255,0.15);border:1px solid rgba(0,98,255,0.2);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="floating-badge top-right">📊 Live Dashboard</div>
+        <div class="floating-badge bottom-left">✅ 5S Audit Ready</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <span class="section-label">Features</span>
+      <h2 class="section-title" style="color:#fff;">Everything You Need for<br>Operational Excellence</h2>
+      <p class="section-subtitle">Purpose-built tools that replace spreadsheets and paper forms with a modern, unified workflow.</p>
+      <div class="features-grid">
+        <div class="glass-card feature-card">
+          <div class="feature-icon">💡</div>
+          <h3>Kaizen Idea Tracker</h3>
+          <p>Capture, categorize, and prioritize improvement ideas from your entire team. Track status from suggestion to implementation with full history and accountability.</p>
+        </div>
+        <div class="glass-card feature-card">
+          <div class="feature-icon">📈</div>
+          <h3>Performance Dashboard</h3>
+          <p>Real-time charts and KPIs powered by Chart.js. Visualize trends, track completion rates, and measure the impact of your continuous improvement program.</p>
+        </div>
+        <div class="glass-card feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>5S Audit Tool</h3>
+          <p>Conduct structured 5S audits (Sort, Set in Order, Shine, Standardize, Sustain) with scoring, photo-ready checklists, and historical comparison.</p>
+        </div>
+        <div class="glass-card feature-card">
+          <div class="feature-icon">🧰</div>
+          <h3>Tools Hub</h3>
+          <p>A centralized toolkit with calculators, templates, and reference guides for lean manufacturing — Pareto analysis, fishbone diagrams, and more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section class="screenshots" id="screenshots">
+    <div class="container">
+      <span class="section-label">Screenshots</span>
+      <h2 class="section-title" style="color:#fff;">See It in Action</h2>
+      <p class="section-subtitle">Clean, intuitive interfaces designed for the shop floor and the office.</p>
+      <div class="screenshots-grid">
+        <div class="screenshot-card">
+          <div class="ss-icon">💡</div>
+          <div>Idea Tracker</div>
+        </div>
+        <div class="screenshot-card">
+          <div class="ss-icon">📈</div>
+          <div>Dashboard</div>
+        </div>
+        <div class="screenshot-card">
+          <div class="ss-icon">🔍</div>
+          <div>5S Audit</div>
+        </div>
+        <div class="screenshot-card">
+          <div class="ss-icon">🧰</div>
+          <div>Tools Hub</div>
+        </div>
+        <div class="screenshot-card">
+          <div class="ss-icon">📊</div>
+          <div>Reports View</div>
+        </div>
+        <div class="screenshot-card">
+          <div class="ss-icon">⚙️</div>
+          <div>Settings</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <span class="section-label">How It Works</span>
+      <h2 class="section-title" style="color:#fff;">Up and Running in Minutes</h2>
+      <p class="section-subtitle">No complex setup. No cloud dependencies. You own your data.</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Download</h3>
+          <p>Grab Kaizen Workflow from Gumroad. You'll receive the full source code as a downloadable package.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Install</h3>
+          <p>Run <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:6px;font-size:0.85rem;">npm install && npm start</code> on any machine with Node.js. That's it.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Start Improving</h3>
+          <p>Open your browser, begin logging kaizen ideas, run audits, and watch your performance metrics come alive.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <span class="section-label">Pricing</span>
+      <h2 class="section-title" style="color:#fff;">Simple, Transparent Pricing</h2>
+      <p class="section-subtitle">Start free. Upgrade when you need more power.</p>
+      <div class="pricing-grid">
+        <div class="glass-card pricing-card">
+          <div class="pricing-tier">Base Version</div>
+          <div class="pricing-amount">Free</div>
+          <div class="pricing-desc">Everything you need to get started with continuous improvement.</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Kaizen Idea Tracker</li>
+            <li><span class="check">✓</span> Performance Dashboard</li>
+            <li><span class="check">✓</span> 5S Audit Tool</li>
+            <li><span class="check">✓</span> Tools Hub</li>
+            <li><span class="check">✓</span> Self-hosted on your machine</li>
+            <li><span class="check">✓</span> Community support</li>
+          </ul>
+          <a href="YOUR_GUMROAD_LINK" class="btn btn-secondary">Download Free</a>
+        </div>
+        <div class="glass-card pricing-card featured">
+          <div class="pricing-tier">Pro Upgrade</div>
+ <div class="pricing-amount">$29<span>/one-time</span></div>
+          <div class="pricing-desc">Advanced features for teams and power users.</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Everything in Base</li>
+            <li><span class="check">✓</span> Multi-user support</li>
+            <li><span class="check">✓</span> Advanced analytics & reports</li>
+            <li><span class="check">✓</span> Custom audit templates</li>
+            <li><span class="check">✓</span> Priority email support</li>
+            <li><span class="check">✓</span> Future updates included</li>
+          </ul>
+          <a href="YOUR_GUMROAD_LINK" class="btn btn-primary">Upgrade to Pro →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <span class="section-label">FAQ</span>
+      <h2 class="section-title" style="color:#fff;">Frequently Asked Questions</h2>
+      <p class="section-subtitle">Got questions? We've got answers.</p>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <button class="faq-question">
+            What do I need to run Kaizen Workflow?
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>You need Node.js (v16+) installed on your machine. Kaizen Workflow runs locally in your browser — no cloud account, no subscription, no internet required after installation.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Can I use this for my entire team?
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>The base version is designed for individual use or small teams on a shared machine. The Pro upgrade adds multi-user support with role-based access, making it ideal for larger operations teams.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Is my data secure?
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Absolutely. Kaizen Workflow is fully self-hosted — all data stays on your machine or your company's server. Nothing is sent to external services. You have complete control over your data.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            What's included in the Pro upgrade?
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Pro includes multi-user support, advanced analytics with exportable reports, custom audit templates, priority email support, and all future updates. It's a one-time purchase — no recurring fees.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Can I customize it for my facility?
+            <span class="faq-toggle">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes! Since you receive the full source code, you can customize everything — from branding and color schemes to adding custom fields and reports. The code is clean, well-structured Node.js/Express.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container">
+      <div class="glass cta-box">
+        <h2>Ready to Transform Your Operations?</h2>
+        <p>Join lean practitioners who've replaced spreadsheets with a purpose-built continuous improvement platform.</p>
+        <a href="YOUR_GUMROAD_LINK" class="btn btn-primary">Get Kaizen Workflow on Gumroad →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="nav-logo">Kaizen Workflow</a>
+          <p>Continuous improvement management for modern operations teams. Self-hosted, privacy-first, built for the shop floor.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+          <a href="https://github.com/Z3dxt3nr/kaizen-workflow-app">GitHub</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="https://github.com/Z3dxt3nr/kaizen-workflow-app">Documentation</a>
+          <a href="https://github.com/Z3dxt3nr/kaizen-workflow-app/issues">Support</a>
+          <a href="https://github.com/Z3dxt3nr/kaizen-workflow-app/releases">Changelog</a>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <a href="YOUR_GUMROAD_LINK">Gumroad</a>
+          <a href="https://github.com/Z3dxt3nr/kaizen-workflow-app">GitHub</a>
+          <a href="mailto:your@email.com">Contact</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Kaizen Workflow. All rights reserved.</p>
+        <div class="footer-social">
+          <a href="https://github.com/Z3dxt3nr/kaizen-workflow-app" aria-label="GitHub">GH</a>
+          <a href="YOUR_GUMROAD_LINK" aria-label="Gumroad">GR</a>
+          <a href="mailto:your@email.com" aria-label="Email">@</a>
+        </div>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Mobile toggle
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    mobileToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => navLinks.classList.remove('active'));
+    });
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+  </script>
+</body>
+</html>
