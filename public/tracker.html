@@ -198,6 +198,9 @@
     <br>
     <button onclick="addIdea()">Add Idea</button>
     <button onclick="resetData()" class="danger">🔄 Reset All Data</button>
+    <button onclick="exportTrackerData()" style="background:linear-gradient(120deg,#0984e3,#74b9ff);color:white;">📤 Export Data</button>
+    <button onclick="document.getElementById('importTrackerInput').click()" style="background:linear-gradient(120deg,#00b894,#00cec9);color:white;">📥 Import Data</button>
+    <input type="file" id="importTrackerInput" accept=".json" style="display:none;" onchange="importTrackerData(event)" />
   </div>
 
   <div id="ideaList"></div>
@@ -298,6 +301,63 @@
         loadIdeas();
       }
     }
+
+    // === EXPORT DATA (Tracker) ===
+    function exportTrackerData() {
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      const auditHistory = JSON.parse(localStorage.getItem("kaizen5SAuditHistory")) || [];
+      const exportObj = {
+        version: "1.3.0",
+        exportDate: new Date().toISOString(),
+        ideas: ideas,
+        auditHistory: auditHistory
+      };
+      const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `kaizen-workflow-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("✅ Data exported successfully!", "success");
+    }
+
+    // === IMPORT DATA (Tracker) ===
+    function importTrackerData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!data.ideas || !Array.isArray(data.ideas)) {
+            showToast("❌ Invalid file format: missing ideas array.", "error");
+            return;
+          }
+
+          const existingIdeas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+          const merged = existingIdeas.concat(data.ideas);
+          localStorage.setItem("kaizenIdeas", JSON.stringify(merged));
+
+          if (data.auditHistory && Array.isArray(data.auditHistory)) {
+            const existingHistory = JSON.parse(localStorage.getItem("kaizen5SAuditHistory")) || [];
+            const mergedHistory = existingHistory.concat(data.auditHistory);
+            localStorage.setItem("kaizen5SAuditHistory", JSON.stringify(mergedHistory));
+          }
+
+          showToast(`✅ Imported ${data.ideas.length} ideas successfully!`, "success");
+          loadIdeas();
+        } catch (err) {
+          showToast("❌ Failed to parse import file. Please check the format.", "error");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;

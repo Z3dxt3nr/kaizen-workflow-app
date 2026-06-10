@@ -91,6 +91,47 @@
     .card {
       margin-top: 40px;
     }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 25px 0;
+    }
+
+    .action-buttons button {
+      padding: 12px 22px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .action-buttons button:hover {
+      transform: scale(1.05);
+    }
+
+    .btn-export {
+      background: linear-gradient(120deg, #0984e3, #74b9ff);
+      color: white;
+    }
+
+    .btn-import {
+      background: linear-gradient(120deg, #00b894, #00cec9);
+      color: white;
+    }
+
+    .btn-report {
+      background: linear-gradient(120deg, #6c5ce7, #a29bfe);
+      color: white;
+    }
+
+    #importFileInput {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -105,6 +146,14 @@
 
   <h1>📊 Kaizen Workflow Dashboard</h1>
   <p>Visualize progress, efficiency, and 5S improvements across departments.</p>
+
+  <!-- Action Buttons: Export / Import / Report -->
+  <div class="action-buttons">
+    <button class="btn-export" onclick="exportData()">📤 Export Data</button>
+    <button class="btn-import" onclick="document.getElementById('importFileInput').click()">📥 Import Data</button>
+    <input type="file" id="importFileInput" accept=".json" onchange="importData(event)" />
+    <button class="btn-report" onclick="generateReport()">📄 Generate Report</button>
+  </div>
 
   <!-- Summary Cards -->
   <div class="summary">
@@ -284,6 +333,196 @@
           }
         });
       }
+    }
+
+    // === EXPORT DATA ===
+    function exportData() {
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      const auditHistory = JSON.parse(localStorage.getItem("kaizen5SAuditHistory")) || [];
+      const exportObj = {
+        version: "1.3.0",
+        exportDate: new Date().toISOString(),
+        ideas: ideas,
+        auditHistory: auditHistory
+      };
+      const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `kaizen-workflow-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("✅ Data exported successfully!", "success");
+    }
+
+    // === IMPORT DATA ===
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!data.ideas || !Array.isArray(data.ideas)) {
+            showToast("❌ Invalid file format: missing ideas array.", "error");
+            return;
+          }
+
+          const existingIdeas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+          const merged = existingIdeas.concat(data.ideas);
+          localStorage.setItem("kaizenIdeas", JSON.stringify(merged));
+
+          if (data.auditHistory && Array.isArray(data.auditHistory)) {
+            const existingHistory = JSON.parse(localStorage.getItem("kaizen5SAuditHistory")) || [];
+            const mergedHistory = existingHistory.concat(data.auditHistory);
+            localStorage.setItem("kaizen5SAuditHistory", JSON.stringify(mergedHistory));
+          }
+
+          showToast(`✅ Imported ${data.ideas.length} ideas successfully!`, "success");
+          loadDashboard();
+        } catch (err) {
+          showToast("❌ Failed to parse import file. Please check the format.", "error");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    // === GENERATE REPORT ===
+    function generateReport() {
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      const auditHistory = JSON.parse(localStorage.getItem("kaizen5SAuditHistory")) || [];
+
+      const total = ideas.length;
+      const completed = ideas.filter(i => i.status === "Completed").length;
+      const inProgress = ideas.filter(i => i.status === "In Progress").length;
+      const onHold = ideas.filter(i => i.status === "On Hold").length;
+      const percent = total ? Math.round((completed / total) * 100) : 0;
+
+      // Department breakdown
+      const deptCounts = {};
+      ideas.forEach(i => {
+        deptCounts[i.department] = (deptCounts[i.department] || 0) + 1;
+      });
+
+      // Category breakdown
+      const catCounts = {};
+      ideas.forEach(i => {
+        catCounts[i.category] = (catCounts[i.category] || 0) + 1;
+      });
+
+      // 5S audit summary
+      let auditSummary = "";
+      if (auditHistory.length > 0) {
+        const scores = auditHistory.map(h => parseFloat(h.average));
+        const avgScore = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
+        const latest = auditHistory[auditHistory.length - 1];
+        auditSummary = `
+          <h3>5S Audit Summary</h3>
+          <p><strong>Total Audits:</strong> ${auditHistory.length}</p>
+          <p><strong>Overall Avg Score:</strong> ${avgScore}/5</p>
+          <p><strong>Latest Audit:</strong> ${latest.date} — ${latest.department} — Score: ${latest.average}/5</p>
+        `;
+      } else {
+        auditSummary = `<h3>5S Audit Summary</h3><p>No 5S audits recorded yet.</p>`;
+      }
+
+      const deptRows = Object.entries(deptCounts).map(([dept, count]) =>
+        `<tr><td>${dept}</td><td>${count}</td><td>${total ? Math.round((count / total) * 100) : 0}%</td></tr>`
+      ).join("");
+
+      const catRows = Object.entries(catCounts).map(([cat, count]) =>
+        `<tr><td>${cat}</td><td>${count}</td></tr>`
+      ).join("");
+
+      const ideaRows = ideas.map(i =>
+        `<tr><td>${i.text}</td><td>${i.department}</td><td>${i.category}</td><td>${i.status}</td></tr>`
+      ).join("");
+
+      const reportHTML = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kaizen Workflow Report</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; color: #333; padding: 40px; max-width: 900px; margin: 0 auto; }
+    h1 { color: #0062ff; border-bottom: 3px solid #00b894; padding-bottom: 10px; }
+    h2 { color: #00b894; margin-top: 30px; }
+    h3 { color: #0984e3; }
+    .summary-grid { display: flex; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
+    .summary-box { background: linear-gradient(120deg, #0062ff, #00b894); color: white; border-radius: 10px; padding: 20px 30px; text-align: center; min-width: 140px; }
+    .summary-box h3 { color: white; font-size: 2em; margin: 0; }
+    .summary-box p { margin: 5px 0 0; opacity: 0.9; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    th { background: #0062ff; color: white; padding: 10px; text-align: left; }
+    td { padding: 8px 10px; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) { background: #f8f9fa; }
+    .footer { margin-top: 40px; padding-top: 15px; border-top: 2px solid #eee; color: #888; font-size: 0.9em; }
+    @media print {
+      body { padding: 20px; }
+      .summary-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Kaizen Workflow — Data Summary Report</h1>
+  <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+
+  <h2>Overview</h2>
+  <div class="summary-grid">
+    <div class="summary-box"><h3>${total}</h3><p>Total Ideas</p></div>
+    <div class="summary-box"><h3>${completed}</h3><p>Completed</p></div>
+    <div class="summary-box"><h3>${inProgress}</h3><p>In Progress</p></div>
+    <div class="summary-box"><h3>${onHold}</h3><p>On Hold</p></div>
+    <div class="summary-box"><h3>${percent}%</h3><p>Completion Rate</p></div>
+  </div>
+
+  <h2>Department Breakdown</h2>
+  <table>
+    <thead><tr><th>Department</th><th>Ideas</th><th>Share</th></tr></thead>
+    <tbody>${deptRows || '<tr><td colspan="3">No data</td></tr>'}</tbody>
+  </table>
+
+  <h2>Category Breakdown</h2>
+  <table>
+    <thead><tr><th>Category</th><th>Count</th></tr></thead>
+    <tbody>${catRows || '<tr><td colspan="2">No data</td></tr>'}</tbody>
+  </table>
+
+  <h2>All Ideas</h2>
+  <table>
+    <thead><tr><th>Idea</th><th>Department</th><th>Category</th><th>Status</th></tr></thead>
+    <tbody>${ideaRows || '<tr><td colspan="4">No ideas recorded</td></tr>'}</tbody>
+  </table>
+
+  ${auditSummary}
+
+  <div class="footer">
+    <p>Kaizen Workflow App — Continuous Improvement, Simplified. | Report generated on ${new Date().toLocaleString()}</p>
+  </div>
+</body>
+</html>`;
+
+      const reportWindow = window.open("", "_blank");
+      reportWindow.document.write(reportHTML);
+      reportWindow.document.close();
+    }
+
+    // === TOAST NOTIFICATION ===
+    function showToast(message, type = "info") {
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.classList.add("show"), 100);
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
     }
 
     initializeDates();

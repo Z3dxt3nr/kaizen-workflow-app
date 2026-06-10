@@ -7,7 +7,7 @@
     "dash board": true,
     "auditTool": true,
     "imageUpload": true,
-    "exportImport": false,
+    "exportImport": true,
     "cloudSync": false,
     "advancedTools": false
   }

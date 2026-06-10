@@ -86,7 +86,7 @@
     <tr><td>Sustain</td><td><input type="number" id="sustain" min="1" max="5" /></td></tr>
   </table>
 
-  <h3 style="margin-top: 20px;">Select Department</h3>
+  <h3>Select Department</h3>
   <select id="departmentSelect" style="padding: 10px; border-radius: 6px; border: none;">
     <option value="">-- Choose Department --</option>
     <option value="Production">Production</option>
@@ -100,9 +100,36 @@
   <br><br>
   <button onclick="calculate5S()">Calculate Score</button>
   <button id="saveAudit" onclick="saveAudit()" style="display:none;">Save Results to Tracker</button>
+  <button id="saveToHistoryBtn" onclick="saveAuditToHistory()" style="display:none; background:#0984e3;">💾 Save to Audit History</button>
   <h3 id="result"></h3>
 </div>
 
+<div id="auditHistorySection" class="card" style="display:none; margin-top:30px;">
+  <h2>📋 Audit History</h2>
+  <table id="auditHistoryTable" style="width:100%; color:white; border-collapse:collapse;">
+    <thead>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.4);">
+        <th style="padding:8px;">Date</th>
+        <th style="padding:8px;">Department</th>
+        <th style="padding:8px;">Sort</th>
+        <th style="padding:8px;">Set Order</th>
+        <th style="padding:8px;">Shine</th>
+        <th style="padding:8px;">Standardize</th>
+        <th style="padding:8px;">Sustain</th>
+        <th style="padding:8px;">Avg Score</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2 style="margin-top:30px;">📈 5S Score Trend</h2>
+  <canvas id="auditTrendChart" width="400" height="200"></canvas>
+
+  <br><br>
+  <button onclick="clearAuditHistory()" class="danger" style="margin-top:15px;">🗑️ Clear Audit History</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   function calculate5S() {
     const values = [
@@ -116,7 +143,8 @@
     const average = (total / 5).toFixed(2);
 
     document.getElementById('result').innerText = `Average 5S Score: ${average}/5`;
-    document.getElementById('saveAudit').style.display = "inline-block"; // show save button
+    document.getElementById('saveAudit').style.display = "inline-block";
+    document.getElementById('saveToHistoryBtn').style.display = "inline-block";
   }
 
   function saveAudit() {
@@ -146,8 +174,141 @@
     existingIdeas.push(newIdea);
     localStorage.setItem("kaizenIdeas", JSON.stringify(existingIdeas));
 
-    alert(`✅ 5S Audit saved to Tracker for ${department}!`);
+    showToast(`✅ 5S Audit saved to Tracker for ${department}!`, "success");
   }
+
+  function saveAuditToHistory() {
+    const department = document.getElementById('departmentSelect').value;
+    const scoreText = document.getElementById('result').innerText;
+
+    if (!scoreText) {
+      showToast("⚠️ Please calculate the score first!", "error");
+      return;
+    }
+    if (!department) {
+      showToast("⚠️ Please select a department before saving!", "error");
+      return;
+    }
+
+    const sort = +document.getElementById('sort').value || 0;
+    const setOrder = +document.getElementById('setOrder').value || 0;
+    const shine = +document.getElementById('shine').value || 0;
+    const standardize = +document.getElementById('standardize').value || 0;
+    const sustain = +document.getElementById('sustain').value || 0;
+    const total = sort + setOrder + shine + standardize + sustain;
+    const average = (total / 5).toFixed(2);
+
+    const auditEntry = {
+      date: new Date().toLocaleString(),
+      department: department,
+      sort: sort,
+      setOrder: setOrder,
+      shine: shine,
+      standardize: standardize,
+      sustain: sustain,
+      average: average
+    };
+
+    const history = JSON.parse(localStorage.getItem("kaizen5SAuditHistory")) || [];
+    history.push(auditEntry);
+    localStorage.setItem("kaizen5SAuditHistory", JSON.stringify(history));
+
+    showToast("✅ 5S Audit saved to history!", "success");
+    renderAuditHistory();
+  }
+
+  function renderAuditHistory() {
+    const history = JSON.parse(localStorage.getItem("kaizen5SAuditHistory")) || [];
+    const section = document.getElementById('auditHistorySection');
+    const tbody = document.querySelector('#auditHistoryTable tbody');
+
+    if (history.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = 'block';
+    tbody.innerHTML = '';
+
+    history.forEach(entry => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid rgba(255,255,255,0.2)';
+      tr.innerHTML = `
+        <td style="padding:8px;">${entry.date}</td>
+        <td style="padding:8px;">${entry.department}</td>
+        <td style="padding:8px;">${entry.sort}</td>
+        <td style="padding:8px;">${entry.setOrder}</td>
+        <td style="padding:8px;">${entry.shine}</td>
+        <td style="padding:8px;">${entry.standardize}</td>
+        <td style="padding:8px;">${entry.sustain}</td>
+        <td style="padding:8px; font-weight:bold;">${entry.average}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    renderTrendChart();
+  }
+
+  function renderTrendChart() {
+    const history = JSON.parse(localStorage.getItem("kaizen5SAuditHistory")) || [];
+    const ctx = document.getElementById('auditTrendChart');
+    if (!ctx) return;
+
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) existingChart.destroy();
+
+    const labels = history.map(h => h.date);
+    const scores = history.map(h => parseFloat(h.average));
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '5S Average Score',
+          data: scores,
+          borderColor: '#00b894',
+          backgroundColor: 'rgba(0,184,148,0.2)',
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#00ffcc',
+          pointRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: 'white' } }
+        },
+        scales: {
+          y: { min: 0, max: 5, ticks: { color: 'white' } },
+          x: { ticks: { color: 'white', maxRotation: 45 } }
+        }
+      }
+    });
+  }
+
+  function clearAuditHistory() {
+    if (confirm("⚠️ This will delete all 5S audit history. Continue?")) {
+      localStorage.removeItem("kaizen5SAuditHistory");
+      renderAuditHistory();
+      showToast("🗑️ Audit history cleared!", "info");
+    }
+  }
+
+  function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 100);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 400);
+    }, 3000);
+  }
+
+  document.addEventListener('DOMContentLoaded', renderAuditHistory);
 </script>
 
 
