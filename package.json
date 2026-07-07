@@ -4,9 +4,13 @@
   "description": "Kaizen Workflow — Continuous Improvement Platform",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node tests/tracker-edit-status.test.js"
   },
   "dependencies": {
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
   }
 }

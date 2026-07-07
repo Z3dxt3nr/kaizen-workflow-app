@@ -114,6 +114,32 @@
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     }
 
+    .idea-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .status-editor {
+      width: auto;
+      min-width: 150px;
+      margin: 0 8px 0 0;
+    }
+
+    .edit-mode-banner {
+      background: rgba(255, 221, 89, 0.2);
+      border: 1px solid rgba(255, 221, 89, 0.6);
+      border-radius: 10px;
+      color: #fff7bf;
+      display: none;
+      font-weight: 600;
+      margin: 10px auto 15px;
+      max-width: 620px;
+      padding: 10px;
+    }
+
     footer {
       margin-top: 50px;
       opacity: 0.8;
@@ -196,7 +222,9 @@
     <div id="photoPreview" style="margin-top:10px;"></div>
 
     <br>
-    <button onclick="addIdea()">Add Idea</button>
+    <div id="editModeBanner" class="edit-mode-banner">Editing idea — update the fields above, then save or cancel.</div>
+    <button id="saveIdeaButton" onclick="saveIdea()">Add Idea</button>
+    <button id="cancelEditButton" onclick="cancelEdit()" style="display:none;background:#636e72;">Cancel Edit</button>
     <button onclick="resetData()" class="danger">🔄 Reset All Data</button>
     <button onclick="exportTrackerData()" style="background:linear-gradient(120deg,#0984e3,#74b9ff);color:white;">📤 Export Data</button>
     <button onclick="document.getElementById('importTrackerInput').click()" style="background:linear-gradient(120deg,#00b894,#00cec9);color:white;">📥 Import Data</button>
@@ -208,6 +236,20 @@
   <footer>© 2026 Kaizen Workflow — Continuous Improvement, Simplified.</footer>
 
   <script>
+    let editingIdeaIndex = null;
+
+    const statusOptions = ["In Progress", "Completed", "On Hold"];
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>'"]/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;"
+      }[char]));
+    }
+
     function previewPhoto(event) {
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -218,6 +260,14 @@
       reader.readAsDataURL(event.target.files[0]);
     }
 
+    function saveIdea() {
+      if (editingIdeaIndex === null) {
+        addIdea();
+      } else {
+        saveIdeaEdit();
+      }
+    }
+
     function addIdea() {
       const text = document.getElementById("ideaInput").value.trim();
       const department = document.getElementById("department").value;
@@ -226,19 +276,87 @@
       const photo = localStorage.getItem("ideaPhoto") || null;
 
       if (!text) {
-       showToast("⚠️ Please enter an idea before adding!", "error");
+        showToast("⚠️ Please enter an idea before adding!", "error");
         return;
       }
 
-      const newIdea = { text, department, category, status, photo };
+      const newIdea = { text, department, category, status, photo, dateAdded: new Date().toISOString() };
       const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
       ideas.push(newIdea);
       localStorage.setItem("kaizenIdeas", JSON.stringify(ideas));
-      localStorage.removeItem("ideaPhoto");
-
-      document.getElementById("ideaInput").value = "";
-      document.getElementById("photoPreview").innerHTML = "";
+      clearForm();
+      showToast("✅ Idea added successfully!", "success");
       loadIdeas();
+    }
+
+    function editIdea(index) {
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      const idea = ideas[index];
+      if (!idea) return;
+
+      editingIdeaIndex = index;
+      document.getElementById("ideaInput").value = idea.text || "";
+      document.getElementById("department").value = idea.department || "Production";
+      document.getElementById("category").value = idea.category || "Efficiency";
+      document.getElementById("statusSelect").value = idea.status || "In Progress";
+      document.getElementById("photoPreview").innerHTML = idea.photo
+        ? `<img src="${idea.photo}" style="max-width:200px;border-radius:5px;">`
+        : "";
+
+      document.getElementById("saveIdeaButton").textContent = "Save Changes";
+      document.getElementById("cancelEditButton").style.display = "inline-block";
+      document.getElementById("editModeBanner").style.display = "block";
+      document.getElementById("ideaInput").focus();
+    }
+
+    function saveIdeaEdit() {
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      const idea = ideas[editingIdeaIndex];
+      const text = document.getElementById("ideaInput").value.trim();
+
+      if (!idea) {
+        cancelEdit();
+        showToast("❌ Could not find that idea. Please try again.", "error");
+        return;
+      }
+
+      if (!text) {
+        showToast("⚠️ Idea text cannot be empty.", "error");
+        return;
+      }
+
+      const replacementPhoto = localStorage.getItem("ideaPhoto");
+      ideas[editingIdeaIndex] = {
+        ...idea,
+        text,
+        department: document.getElementById("department").value,
+        category: document.getElementById("category").value,
+        status: document.getElementById("statusSelect").value,
+        photo: replacementPhoto || idea.photo || null,
+        dateUpdated: new Date().toISOString()
+      };
+
+      localStorage.setItem("kaizenIdeas", JSON.stringify(ideas));
+      clearForm();
+      showToast("✅ Idea updated successfully!", "success");
+      loadIdeas();
+    }
+
+    function cancelEdit() {
+      editingIdeaIndex = null;
+      clearForm();
+      loadIdeas();
+    }
+
+    function clearForm() {
+      document.getElementById("ideaInput").value = "";
+      document.getElementById("photoInput").value = "";
+      document.getElementById("photoPreview").innerHTML = "";
+      document.getElementById("saveIdeaButton").textContent = "Add Idea";
+      document.getElementById("cancelEditButton").style.display = "none";
+      document.getElementById("editModeBanner").style.display = "none";
+      localStorage.removeItem("ideaPhoto");
+      editingIdeaIndex = null;
     }
 
     function loadIdeas() {
@@ -249,19 +367,42 @@
       ideas.forEach((idea, index) => {
         const div = document.createElement("div");
         div.className = "idea";
+        const safeText = escapeHTML(idea.text);
+        const safeDepartment = escapeHTML(idea.department);
+        const safeCategory = escapeHTML(idea.category);
+        const safeStatus = escapeHTML(idea.status || "In Progress");
+        const statusSelect = `
+          <label for="ideaStatus${index}"><b>Status:</b></label>
+          <select id="ideaStatus${index}" class="status-editor" data-testid="idea-status-select-${index}" onchange="updateIdeaStatus(${index}, this.value)">
+            ${statusOptions.map(status => `<option value="${status}" ${status === idea.status ? "selected" : ""}>${status}</option>`).join("")}
+          </select>`;
+
         div.innerHTML = `
-          <h3>${idea.text}</h3>
-          <p><b>Department:</b> ${idea.department} | <b>Category:</b> ${idea.category} | <b>Status:</b> ${idea.status}</p>
+          <h3>${safeText}</h3>
+          <p><b>Department:</b> ${safeDepartment} | <b>Category:</b> ${safeCategory} | <b>Status:</b> <span data-testid="idea-status-text-${index}">${safeStatus}</span></p>
+          ${statusSelect}
           ${
             idea.photo
-              ? `<img src="${idea.photo}" alt="Idea photo"><br><button onclick="removeIdeaPhoto(${index})" style="background:#e17055;color:white;border:none;padding:5px 10px;border-radius:5px;">❌ Remove Photo</button>`
-              : `<input type="file" accept="image/*" onchange="updateIdeaPhoto(event, ${index})">`
+              ? `<br><img src="${idea.photo}" alt="Idea photo"><br><button onclick="removeIdeaPhoto(${index})" style="background:#e17055;color:white;border:none;padding:5px 10px;border-radius:5px;">❌ Remove Photo</button>`
+              : `<br><input type="file" accept="image/*" onchange="updateIdeaPhoto(event, ${index})">`
           }
-          <br><br>
-          <button onclick="deleteIdea(${index})" class="danger">🗑️ Delete</button>
+          <div class="idea-actions">
+            <button onclick="editIdea(${index})">✏️ Edit Details</button>
+            <button onclick="deleteIdea(${index})" class="danger">🗑️ Delete</button>
+          </div>
         `;
         ideaList.appendChild(div);
       });
+    }
+
+    function updateIdeaStatus(index, status) {
+      const ideas = JSON.parse(localStorage.getItem("kaizenIdeas")) || [];
+      if (!ideas[index]) return;
+      ideas[index].status = status;
+      ideas[index].dateUpdated = new Date().toISOString();
+      localStorage.setItem("kaizenIdeas", JSON.stringify(ideas));
+      loadIdeas();
+      showToast(`✅ Status updated to ${status}!`, "success");
     }
 
     function updateIdeaPhoto(event, index) {
