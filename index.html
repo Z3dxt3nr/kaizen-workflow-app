@@ -348,29 +348,79 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 24px;
+      text-align: left;
     }
     .screenshot-card {
       border-radius: 16px;
       overflow: hidden;
-      aspect-ratio: 16/10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255,255,255,0.5);
-      font-weight: 600;
-      font-size: 0.9rem;
-      border: 2px dashed rgba(255,255,255,0.12);
-      transition: border-color 0.3s;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #0c1326;
+      box-shadow: 0 18px 48px rgba(0,0,0,0.22);
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
     }
-    .screenshot-card:hover { border-color: rgba(0,184,148,0.4); }
-    .screenshot-card .ss-icon { font-size: 2rem; margin-bottom: 12px; opacity: 0.5; }
-    .screenshot-card:nth-child(1) { background: linear-gradient(135deg, rgba(0,98,255,0.08), rgba(0,98,255,0.02)); }
-    .screenshot-card:nth-child(2) { background: linear-gradient(135deg, rgba(0,184,148,0.08), rgba(0,184,148,0.02)); }
-    .screenshot-card:nth-child(3) { background: linear-gradient(135deg, rgba(0,98,255,0.06), rgba(0,184,148,0.06)); }
-    .screenshot-card:nth-child(4) { background: linear-gradient(135deg, rgba(0,184,148,0.06), rgba(0,98,255,0.06)); }
-    .screenshot-card:nth-child(5) { background: linear-gradient(135deg, rgba(0,98,255,0.1), rgba(0,184,148,0.02)); }
-    .screenshot-card:nth-child(6) { background: linear-gradient(135deg, rgba(0,184,148,0.1), rgba(0,98,255,0.02)); }
+    .screenshot-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0,184,148,0.55);
+      box-shadow: 0 24px 56px rgba(0,0,0,0.32);
+    }
+    .product-shot {
+      aspect-ratio: 16/10;
+      padding: 10px;
+      background: radial-gradient(circle at 80% 5%, rgba(0,184,148,0.16), transparent 34%), linear-gradient(135deg, #111d3b, #0a1020);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      color: #e9efff;
+      overflow: hidden;
+    }
+    .shot-window {
+      height: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #101a31;
+    }
+    .shot-topbar {
+      height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 9px;
+      background: rgba(255,255,255,0.055);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .shot-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.23); }
+    .shot-dot:first-child { background: #ff6b6b; }
+    .shot-dot:nth-child(2) { background: #ffd166; }
+    .shot-dot:nth-child(3) { background: #00b894; }
+    .shot-app { font-size: 0.5rem; font-weight: 800; letter-spacing: 0.04em; margin-left: 5px; color: rgba(255,255,255,0.58); }
+    .shot-body { padding: 12px; }
+    .shot-kicker { color: #63a4ff; font-size: 0.48rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+    .shot-heading { font-size: 0.9rem; font-weight: 800; margin: 4px 0 10px; color: #fff; }
+    .shot-caption { padding: 14px 16px 16px; }
+    .shot-caption h3 { margin: 0 0 5px; color: #fff; font-size: 1rem; }
+    .shot-caption p { margin: 0; color: rgba(255,255,255,0.52); font-size: 0.8rem; line-height: 1.5; }
+    .tracker-entry { display: flex; align-items: center; gap: 7px; padding: 7px; margin-top: 5px; border-radius: 5px; background: rgba(255,255,255,0.055); }
+    .tracker-check { width: 9px; height: 9px; border-radius: 3px; background: #00b894; flex: 0 0 auto; }
+    .tracker-copy { min-width: 0; flex: 1; }
+    .tracker-name { color: rgba(255,255,255,0.9); font-size: 0.54rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tracker-meta { margin-top: 2px; color: rgba(255,255,255,0.38); font-size: 0.42rem; }
+    .pill { padding: 3px 5px; border-radius: 99px; font-size: 0.39rem; font-weight: 800; color: #79f2cf; background: rgba(0,184,148,0.14); }
+    .pill.blue { color: #9bc4ff; background: rgba(0,98,255,0.18); }
+    .shot-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .shot-stat { padding: 8px; border-radius: 5px; background: rgba(255,255,255,0.055); }
+    .shot-stat strong { display: block; color: #fff; font-size: 0.82rem; }
+    .shot-stat span { display: block; margin-top: 3px; color: rgba(255,255,255,0.4); font-size: 0.39rem; }
+    .shot-chart { display: flex; align-items: flex-end; gap: 7px; height: 62px; padding: 10px 6px 5px; margin-top: 8px; border-radius: 5px; background: rgba(255,255,255,0.04); }
+    .shot-bar { width: 13%; border-radius: 3px 3px 1px 1px; background: linear-gradient(180deg, #63a4ff, #0062ff); }
+    .shot-bar.green { background: linear-gradient(180deg, #64dfc1, #00b894); }
+    .audit-score { display: flex; align-items: center; gap: 10px; margin: 8px 0; padding: 9px; border-radius: 6px; background: rgba(0,184,148,0.1); border: 1px solid rgba(0,184,148,0.18); }
+    .score-ring { width: 32px; height: 32px; display: grid; place-items: center; border: 4px solid #00b894; border-left-color: rgba(255,255,255,0.15); border-radius: 50%; color: #fff; font-size: 0.55rem; font-weight: 900; }
+    .audit-score strong { display: block; color: #fff; font-size: 0.57rem; }
+    .audit-score span { color: rgba(255,255,255,0.46); font-size: 0.43rem; }
+    .audit-row { display: grid; grid-template-columns: 1fr 1.3fr auto; gap: 6px; align-items: center; margin-top: 5px; color: rgba(255,255,255,0.66); font-size: 0.46rem; }
+    .audit-line { height: 4px; border-radius: 5px; background: rgba(255,255,255,0.11); overflow: hidden; }
+    .audit-line i { display: block; height: 100%; border-radius: inherit; background: #00b894; }
+    .audit-mark { color: #82f3d2; font-weight: 800; }
+    @media (max-width: 850px) { .screenshots-grid { grid-template-columns: 1fr; max-width: 540px; margin: 0 auto; } }
 
     /* ===== HOW IT WORKS ===== */
     .how-it-works { padding: 100px 0; position: relative; }
@@ -807,31 +857,57 @@
       <h2 class="section-title" style="color:#fff;">See It in Action</h2>
       <p class="section-subtitle">Clean, intuitive interfaces designed for the shop floor and the office.</p>
       <div class="screenshots-grid">
-        <div class="screenshot-card">
-          <div class="ss-icon">💡</div>
-          <div>Idea Tracker</div>
-        </div>
-        <div class="screenshot-card">
-          <div class="ss-icon">📈</div>
-          <div>Dashboard</div>
-        </div>
-        <div class="screenshot-card">
-          <div class="ss-icon">🔍</div>
-          <div>5S Audit</div>
-        </div>
-        <div class="screenshot-card">
-          <div class="ss-icon">🧰</div>
-          <div>Tools Hub</div>
-        </div>
-        <div class="screenshot-card">
-          <div class="ss-icon">📊</div>
-          <div>Reports View</div>
-        </div>
-        <div class="screenshot-card">
-          <div class="ss-icon">⚙️</div>
-          <div>Settings</div>
-        </div>
+        <article class="screenshot-card">
+          <div class="product-shot" role="img" aria-label="Illustrative Kaizen idea tracker preview">
+            <div class="shot-window">
+              <div class="shot-topbar"><i class="shot-dot"></i><i class="shot-dot"></i><i class="shot-dot"></i><span class="shot-app">KAIZEN WORKFLOW / TRACKER</span></div>
+              <div class="shot-body">
+                <div class="shot-kicker">Improvement log</div>
+                <div class="shot-heading">Open ideas</div>
+                <div class="tracker-entry"><span class="tracker-check"></span><div class="tracker-copy"><div class="tracker-name">Label fast-moving spare parts</div><div class="tracker-meta">Logistics · Quality</div></div><span class="pill blue">In progress</span></div>
+                <div class="tracker-entry"><span class="tracker-check"></span><div class="tracker-copy"><div class="tracker-name">Reduce changeover checklist steps</div><div class="tracker-meta">Production · Efficiency</div></div><span class="pill blue">In progress</span></div>
+                <div class="tracker-entry"><span class="tracker-check"></span><div class="tracker-copy"><div class="tracker-name">Install shadow board at maintenance bay</div><div class="tracker-meta">Maintenance · Safety</div></div><span class="pill">Complete</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="shot-caption"><h3>Idea Tracker</h3><p>Capture improvement ideas, assign a status, and keep the work visible.</p></div>
+        </article>
+
+        <article class="screenshot-card">
+          <div class="product-shot" role="img" aria-label="Illustrative Kaizen performance dashboard preview">
+            <div class="shot-window">
+              <div class="shot-topbar"><i class="shot-dot"></i><i class="shot-dot"></i><i class="shot-dot"></i><span class="shot-app">KAIZEN WORKFLOW / DASHBOARD</span></div>
+              <div class="shot-body">
+                <div class="shot-kicker">Performance view</div>
+                <div class="shot-heading">Improvement overview</div>
+                <div class="shot-stats"><div class="shot-stat"><strong>24</strong><span>Total ideas</span></div><div class="shot-stat"><strong>15</strong><span>Completed</span></div><div class="shot-stat"><strong>4.2</strong><span>Avg 5S score</span></div></div>
+                <div class="shot-chart"><i class="shot-bar" style="height:42%"></i><i class="shot-bar green" style="height:68%"></i><i class="shot-bar" style="height:54%"></i><i class="shot-bar green" style="height:83%"></i><i class="shot-bar" style="height:64%"></i><i class="shot-bar green" style="height:92%"></i></div>
+              </div>
+            </div>
+          </div>
+          <div class="shot-caption"><h3>Performance Dashboard</h3><p>Turn activity into a clear view of completion, trends, and 5S scores.</p></div>
+        </article>
+
+        <article class="screenshot-card">
+          <div class="product-shot" role="img" aria-label="Illustrative Kaizen 5S audit preview">
+            <div class="shot-window">
+              <div class="shot-topbar"><i class="shot-dot"></i><i class="shot-dot"></i><i class="shot-dot"></i><span class="shot-app">KAIZEN WORKFLOW / 5S AUDIT</span></div>
+              <div class="shot-body">
+                <div class="shot-kicker">Maintenance · Aug 2026</div>
+                <div class="shot-heading">5S workspace audit</div>
+                <div class="audit-score"><div class="score-ring">4.2</div><div><strong>Strong result</strong><span>2 actions to close this week</span></div></div>
+                <div class="audit-row"><span>Sort</span><span class="audit-line"><i style="width:82%"></i></span><b class="audit-mark">4/5</b></div>
+                <div class="audit-row"><span>Set in order</span><span class="audit-line"><i style="width:91%"></i></span><b class="audit-mark">5/5</b></div>
+                <div class="audit-row"><span>Shine</span><span class="audit-line"><i style="width:72%"></i></span><b class="audit-mark">4/5</b></div>
+                <div class="audit-row"><span>Standardize</span><span class="audit-line"><i style="width:72%"></i></span><b class="audit-mark">4/5</b></div>
+                <div class="audit-row"><span>Sustain</span><span class="audit-line"><i style="width:62%"></i></span><b class="audit-mark">4/5</b></div>
+              </div>
+            </div>
+          </div>
+          <div class="shot-caption"><h3>5S Audit Tool</h3><p>Score the five pillars, save history, and turn gaps into follow-up actions.</p></div>
+        </article>
       </div>
+      <p style="margin:24px auto 0;max-width:620px;color:rgba(255,255,255,0.34);font-size:0.78rem;">Illustrative sample data shown. Actual screens reflect your team’s own local data.</p>
     </div>
   </section>
 
