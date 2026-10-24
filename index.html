@@ -346,11 +346,14 @@
     .screenshots .section-subtitle { margin: 0 auto 60px; }
     .screenshots-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 24px;
       text-align: left;
     }
     .screenshot-card {
+      display: block;
+      color: inherit;
+      text-decoration: none;
       border-radius: 16px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.12);
@@ -358,6 +361,15 @@
       box-shadow: 0 18px 48px rgba(0,0,0,0.22);
       transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
     }
+    .screenshot-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1280 / 577;
+      object-fit: cover;
+      object-position: top;
+    }
+    .screenshot-card:focus-visible { outline: 3px solid #00b894; outline-offset: 4px; }
     .screenshot-card:hover {
       transform: translateY(-6px);
       border-color: rgba(0,184,148,0.55);
@@ -857,57 +869,24 @@
       <h2 class="section-title" style="color:#fff;">See It in Action</h2>
       <p class="section-subtitle">Clean, intuitive interfaces designed for the shop floor and the office.</p>
       <div class="screenshots-grid">
-        <article class="screenshot-card">
-          <div class="product-shot" role="img" aria-label="Illustrative Kaizen idea tracker preview">
-            <div class="shot-window">
-              <div class="shot-topbar"><i class="shot-dot"></i><i class="shot-dot"></i><i class="shot-dot"></i><span class="shot-app">KAIZEN WORKFLOW / TRACKER</span></div>
-              <div class="shot-body">
-                <div class="shot-kicker">Improvement log</div>
-                <div class="shot-heading">Open ideas</div>
-                <div class="tracker-entry"><span class="tracker-check"></span><div class="tracker-copy"><div class="tracker-name">Label fast-moving spare parts</div><div class="tracker-meta">Logistics · Quality</div></div><span class="pill blue">In progress</span></div>
-                <div class="tracker-entry"><span class="tracker-check"></span><div class="tracker-copy"><div class="tracker-name">Reduce changeover checklist steps</div><div class="tracker-meta">Production · Efficiency</div></div><span class="pill blue">In progress</span></div>
-                <div class="tracker-entry"><span class="tracker-check"></span><div class="tracker-copy"><div class="tracker-name">Install shadow board at maintenance bay</div><div class="tracker-meta">Maintenance · Safety</div></div><span class="pill">Complete</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="shot-caption"><h3>Idea Tracker</h3><p>Capture improvement ideas, assign a status, and keep the work visible.</p></div>
-        </article>
-
-        <article class="screenshot-card">
-          <div class="product-shot" role="img" aria-label="Illustrative Kaizen performance dashboard preview">
-            <div class="shot-window">
-              <div class="shot-topbar"><i class="shot-dot"></i><i class="shot-dot"></i><i class="shot-dot"></i><span class="shot-app">KAIZEN WORKFLOW / DASHBOARD</span></div>
-              <div class="shot-body">
-                <div class="shot-kicker">Performance view</div>
-                <div class="shot-heading">Improvement overview</div>
-                <div class="shot-stats"><div class="shot-stat"><strong>24</strong><span>Total ideas</span></div><div class="shot-stat"><strong>15</strong><span>Completed</span></div><div class="shot-stat"><strong>4.2</strong><span>Avg 5S score</span></div></div>
-                <div class="shot-chart"><i class="shot-bar" style="height:42%"></i><i class="shot-bar green" style="height:68%"></i><i class="shot-bar" style="height:54%"></i><i class="shot-bar green" style="height:83%"></i><i class="shot-bar" style="height:64%"></i><i class="shot-bar green" style="height:92%"></i></div>
-              </div>
-            </div>
-          </div>
-          <div class="shot-caption"><h3>Performance Dashboard</h3><p>Turn activity into a clear view of completion, trends, and 5S scores.</p></div>
-        </article>
-
-        <article class="screenshot-card">
-          <div class="product-shot" role="img" aria-label="Illustrative Kaizen 5S audit preview">
-            <div class="shot-window">
-              <div class="shot-topbar"><i class="shot-dot"></i><i class="shot-dot"></i><i class="shot-dot"></i><span class="shot-app">KAIZEN WORKFLOW / 5S AUDIT</span></div>
-              <div class="shot-body">
-                <div class="shot-kicker">Maintenance · Aug 2026</div>
-                <div class="shot-heading">5S workspace audit</div>
-                <div class="audit-score"><div class="score-ring">4.2</div><div><strong>Strong result</strong><span>2 actions to close this week</span></div></div>
-                <div class="audit-row"><span>Sort</span><span class="audit-line"><i style="width:82%"></i></span><b class="audit-mark">4/5</b></div>
-                <div class="audit-row"><span>Set in order</span><span class="audit-line"><i style="width:91%"></i></span><b class="audit-mark">5/5</b></div>
-                <div class="audit-row"><span>Shine</span><span class="audit-line"><i style="width:72%"></i></span><b class="audit-mark">4/5</b></div>
-                <div class="audit-row"><span>Standardize</span><span class="audit-line"><i style="width:72%"></i></span><b class="audit-mark">4/5</b></div>
-                <div class="audit-row"><span>Sustain</span><span class="audit-line"><i style="width:62%"></i></span><b class="audit-mark">4/5</b></div>
-              </div>
-            </div>
-          </div>
-          <div class="shot-caption"><h3>5S Audit Tool</h3><p>Score the five pillars, save history, and turn gaps into follow-up actions.</p></div>
-        </article>
+        <a href="public/tracker.html" class="screenshot-card">
+          <img src="public/images/tracker.png" alt="Idea Tracker with sample improvement ideas" loading="lazy" width="1280" height="577">
+          <div class="shot-caption"><h3>Idea Tracker</h3><p>Log improvement ideas and follow each one through to completion.</p></div>
+        </a>
+        <a href="public/dashboard.html" class="screenshot-card">
+          <img src="public/images/dashboard.png" alt="Dashboard showing five sample ideas and an average audit score" loading="lazy" width="1280" height="577">
+          <div class="shot-caption"><h3>Performance Dashboard</h3><p>See idea counts, completion status, charts, and average 5S results.</p></div>
+        </a>
+        <a href="public/tools/5s.html" class="screenshot-card">
+          <img src="public/images/5s-audit.png" alt="5S audit with sample scores and saved audit history" loading="lazy" width="1280" height="577">
+          <div class="shot-caption"><h3>5S Audit Tool</h3><p>Score your workspace and review saved audit history.</p></div>
+        </a>
+        <a href="public/tools/index.html" class="screenshot-card">
+          <img src="public/images/tools-hub.png" alt="Tools Hub showing included improvement resources" loading="lazy" width="1280" height="577">
+          <div class="shot-caption"><h3>Tools Hub</h3><p>Explore the tools included in the app.</p></div>
+        </a>
       </div>
-      <p style="margin:24px auto 0;max-width:620px;color:rgba(255,255,255,0.34);font-size:0.78rem;">Illustrative sample data shown. Actual screens reflect your team’s own local data.</p>
+      <p style="margin:24px auto 0;max-width:620px;color:rgba(255,255,255,0.55);font-size:0.78rem;">Screenshots from the real app with illustrative local sample data. Click a screen to explore; your own browser data remains separate.</p>
     </div>
   </section>
 

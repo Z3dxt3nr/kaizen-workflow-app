@@ -223,12 +223,18 @@
       const completed = ideas.filter(i => i.status === "Completed").length;
       const inProgress = ideas.filter(i => i.status === "In Progress").length;
       const onHold = ideas.filter(i => i.status === "On Hold").length;
+      const auditHistory = JSON.parse(localStorage.getItem("kaizen5SAuditHistory")) || [];
+      const scores = auditHistory.map(audit => Number(audit.average)).filter(Number.isFinite);
+      const average5S = scores.length
+        ? `${(scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(2)}/5`
+        : "-";
 
       // === UPDATE SUMMARY COUNTS ===
       document.getElementById("totalIdeas").innerText = total;
       document.getElementById("completedIdeas").innerText = completed;
       document.getElementById("inProgressIdeas").innerText = inProgress;
       document.getElementById("onHoldIdeas").innerText = onHold;
+      document.getElementById("avgScore").innerText = average5S;
 
       // === PROGRESS BAR ===
       const percent = total ? Math.round((completed / total) * 100) : 0;
